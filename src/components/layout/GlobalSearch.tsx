@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import { navItems } from "@/config/navigation";
+import { navigation } from "@/config/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,21 +36,29 @@ export function GlobalSearch() {
   }, []);
 
   const searchableItems = React.useMemo(() => {
-    const items: { title: string; href: string; icon: React.ReactNode }[] = [];
-    navItems.forEach((item) => {
-      if (item.href) {
-        items.push({ title: item.title, href: item.href, icon: item.icon });
-      }
-      if (item.children) {
-        item.children.forEach((child) => {
+    const items: {
+      title: string;
+      href: string;
+      icon: React.ComponentType<{ className?: string }>;
+    }[] = [];
+
+    navigation.forEach((group) => {
+      group.items.forEach((item) => {
+        items.push({
+          title: item.title,
+          href: item.url,
+          icon: item.icon,
+        });
+        item.items?.forEach((child) => {
           items.push({
-            title: `${ item.title } > ${ child.title }`,
-            href: child.href,
+            title: `${item.title} > ${child.title}`,
+            href: child.url,
             icon: item.icon,
           });
         });
-      }
+      });
     });
+
     return items;
   }, []);
 
@@ -58,10 +66,10 @@ export function GlobalSearch() {
     <>
       <Button
         variant="outline"
-        className={ cn(
+        className={cn(
           "relative h-9 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-muted-foreground shadow-none sm:pr-12 md:w-2/3 lg:w-1/3"
-        ) }
-        onClick={ () => setOpen(true) }
+        )}
+        onClick={() => setOpen(true)}
       >
         <Search className="mr-2 h-4 w-4 shrink-0" />
         <span className="hidden lg:inline-flex">Search pages...</span>
@@ -70,25 +78,26 @@ export function GlobalSearch() {
           <span className="text-xs">⌘</span>K
         </kbd>
       </Button>
-      <CommandDialog open={ open } onOpenChange={ setOpen }>
+      <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="Pages">
-            { searchableItems.map((item) => (
-              <CommandItem
-                key={ item.href }
-                value={ item.title }
-                onSelect={ () => {
-                  runCommand(() => router.push(item.href));
-                } }
-              >
-                <div className="mr-2 flex h-4 w-4 items-center justify-center">
-                  { item.icon }
-                </div>
-                { item.title }
-              </CommandItem>
-            )) }
+            {searchableItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <CommandItem
+                  key={item.href + item.title}
+                  value={item.title}
+                  onSelect={() => {
+                    runCommand(() => router.push(item.href));
+                  }}
+                >
+                  <Icon className="mr-2 h-4 w-4 shrink-0" />
+                  {item.title}
+                </CommandItem>
+              );
+            })}
           </CommandGroup>
         </CommandList>
       </CommandDialog>

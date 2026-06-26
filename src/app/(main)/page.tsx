@@ -1,9 +1,22 @@
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { RichTextEditor } from "@/components/shared/forms/RichTextEditor";
+import { ImageUploader } from "@/components/shared/forms/ImageUploader";
+import { HtmlContent } from "@/components/shared/text/HtmlContent";
+import { useState } from "react";
+import { FileUploader } from "@/components/shared/forms/FileUploader";
 export default function DashboardPage() {
+  const [content, setContent] = useState("");
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+      <Button onClick={ () => {
+        toast.success("Button clicked");
+      } }>
+        Click me
+      </Button>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -100,6 +113,16 @@ export default function DashboardPage() {
             </p>
           </CardContent>
         </Card>
+      </div>
+      <RichTextEditor value={ content } onChange={ setContent } />
+      <ImageUploader />
+      <FileUploader />
+
+      <div className="mt-4">
+        <h2 className="text-lg font-bold">Content</h2>
+        <div className="mt-2">
+          <HtmlContent content={ content } />
+        </div>
       </div>
     </div>
   );

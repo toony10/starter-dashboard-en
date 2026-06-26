@@ -4,42 +4,64 @@ import {
   Users,
   FileText,
   BarChart,
+  type LucideIcon,
 } from "lucide-react";
+
+export type NavSubItem = {
+  title: string;
+  url: string;
+};
 
 export type NavItem = {
   title: string;
-  href?: string;
-  icon: React.ReactNode;
-  children?: { title: string; href: string }[];
+  url: string;
+  icon: LucideIcon;
+  items?: NavSubItem[];
 };
 
-export const navItems: NavItem[] = [
+export type NavGroup = {
+  label?: string;
+  items: NavItem[];
+};
+
+export const navigation: NavGroup[] = [
   {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: <LayoutDashboard className="w-4 h-4 shrink-0" />,
-  },
-  {
-    title: "Users",
-    href: "/dashboard/users",
-    icon: <Users className="w-4 h-4 shrink-0" />,
-  },
-  {
-    title: "Posts",
-    icon: <FileText className="w-4 h-4 shrink-0" />,
-    children: [
-      { title: "All Posts", href: "/dashboard/posts" },
-      { title: "Add New", href: "/dashboard/posts/new" },
+    items: [
+      {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: LayoutDashboard,
+      },
+      {
+        title: "Users",
+        url: "/dashboard/users",
+        icon: Users,
+      },
+      {
+        title: "Posts",
+        url: "/dashboard/posts",
+        icon: FileText,
+        items: [
+          { title: "All Posts", url: "/dashboard/posts" },
+          { title: "Add New", url: "/dashboard/posts/new" },
+        ],
+      },
+      {
+        title: "Analytics",
+        url: "/dashboard/analytics",
+        icon: BarChart,
+      },
+      {
+        title: "Settings",
+        url: "/dashboard/settings",
+        icon: Settings,
+      },
     ],
   },
-  {
-    title: "Analytics",
-    href: "/dashboard/analytics",
-    icon: <BarChart className="w-4 h-4 shrink-0" />,
-  },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: <Settings className="w-4 h-4 shrink-0" />,
-  },
 ];
+
+export const user = {
+  name: "John Doe",
+  email: "john.doe@example.com",
+  avatar: "",
+};
