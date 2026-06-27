@@ -122,6 +122,7 @@ export default function DashboardPage() {
         <h2 className="text-lg font-bold">Content</h2>
         <div className="mt-2">
           <HtmlContent content={ content } />
+          {content}
         </div>
       </div>
     </div>

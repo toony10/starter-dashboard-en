@@ -1,10 +1,11 @@
 import {
   LayoutDashboard,
   Settings,
-  Users,
   FileText,
   BarChart,
   type LucideIcon,
+  PencilRuler,
+  Filter,
 } from "lucide-react";
 
 export type NavSubItem = {
@@ -33,17 +34,22 @@ export const navigation: NavGroup[] = [
         icon: LayoutDashboard,
       },
       {
-        title: "Users",
-        url: "/dashboard/users",
-        icon: Users,
+        title: "Forms",
+        url: "/forms",
+        icon: PencilRuler,
+        items: [
+          { title: "Rich Text Editor", url: "/forms/rich-text" },
+          { title: "Image Uploader", url: "/forms/image-uploader" },
+          { title: "File Uploader", url: "/forms/file-uploader" },
+        ],
       },
       {
-        title: "Posts",
-        url: "/dashboard/posts",
-        icon: FileText,
+        title: "Filters",
+        url: "/filters",
+        icon: Filter,
         items: [
-          { title: "All Posts", url: "/dashboard/posts" },
-          { title: "Add New", url: "/dashboard/posts/new" },
+          { title: "Pagination", url: "/filters/pagination" },
+          { title: "Select Filter", url: "/filters/select" },
         ],
       },
       {
