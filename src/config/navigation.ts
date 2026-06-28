@@ -1,7 +1,6 @@
 import {
   LayoutDashboard,
   Settings,
-  FileText,
   BarChart,
   type LucideIcon,
   PencilRuler,
