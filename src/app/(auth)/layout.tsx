@@ -1,7 +1,14 @@
+import { AuroraBackground } from "@/components/auth/AuroraBackground";
+
 export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <div className="relative min-h-svh flex-1">{children}</div>;
+  return (
+    <div className="relative min-h-svh flex-1 overflow-hidden">
+      <AuroraBackground />
+      <div className="relative z-10">{ children }</div>
+    </div>
+  );
 }

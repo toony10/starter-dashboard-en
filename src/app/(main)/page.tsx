@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { RichTextEditor } from "@/components/shared/forms/RichTextEditor";
 import { ImageUploader } from "@/components/shared/forms/ImageUploader";
-import { HtmlContent } from "@/components/shared/text/HtmlContent";
 import { useState } from "react";
 import { FileUploader } from "@/components/shared/forms/FileUploader";
 export default function DashboardPage() {
@@ -114,17 +113,9 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-      <RichTextEditor value={ content } onChange={ setContent } />
+      <RichTextEditor name="content" value={ content } onChange={ setContent } />
       <ImageUploader />
       <FileUploader />
-
-      <div className="mt-4">
-        <h2 className="text-lg font-bold">Content</h2>
-        <div className="mt-2">
-          <HtmlContent content={ content } />
-          {content}
-        </div>
-      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
   ImageIcon,
@@ -20,11 +21,21 @@ export interface ImageFile {
   status: "idle" | "uploading" | "done";
 }
 
+/** Reason a file was rejected during selection/drop. */
+export type RejectReason = "type" | "size" | "duplicate" | "max";
+
+export interface RejectedFile {
+  file: File;
+  reason: RejectReason;
+}
+
 export interface ImageUploaderProps {
   /** Field name for the hidden file <input> */
   name?: string;
   /** Called whenever the list of accepted images changes */
   onChange?: (files: File[]) => void;
+  /** Called with any files that were rejected (type/size/duplicate/max) */
+  onReject?: (rejected: RejectedFile[]) => void;
   /** Maximum number of images allowed (default: 5) */
   maxImages?: number;
   /** Maximum size per file in bytes (default: 5 MB) */
@@ -47,6 +58,8 @@ export interface ImageUploaderProps {
   aspectRatio?: string;
   /** Number of thumbnail columns (default: 3) */
   columns?: 2 | 3 | 4 | 5;
+  /** Show a toast for rejected files (default: true) */
+  showRejectToasts?: boolean;
 }
 
 /* ───────────────────────── Helpers ─────────────────────────── */
@@ -59,6 +72,9 @@ const COLUMNS_CLASS: Record<number, string> = {
 };
 
 function uid() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
   return Math.random().toString(36).slice(2);
 }
 
@@ -66,6 +82,32 @@ function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** Stable key used to detect duplicates. */
+function fileKey(file: File) {
+  return `${file.name}:${file.size}:${file.lastModified}`;
+}
+
+/**
+ * Checks a file against an `accept` string (the same syntax the native
+ * <input accept> uses), e.g. "image/*", "image/png,image/jpeg", ".png,.webp".
+ */
+function matchesAccept(file: File, accept: string) {
+  const tokens = accept
+    .split(",")
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
+  if (tokens.length === 0) return true;
+
+  const type = file.type.toLowerCase();
+  const name = file.name.toLowerCase();
+
+  return tokens.some((token) => {
+    if (token.startsWith(".")) return name.endsWith(token);
+    if (token.endsWith("/*")) return type.startsWith(token.slice(0, -1));
+    return type === token;
+  });
 }
 
 function toImageFiles(files: File[]): ImageFile[] {
@@ -82,6 +124,7 @@ function toImageFiles(files: File[]): ImageFile[] {
 export function ImageUploader({
   name,
   onChange,
+  onReject,
   maxImages = 5,
   maxSize = 5 * 1024 * 1024,
   accept = "image/*",
@@ -93,65 +136,150 @@ export function ImageUploader({
   showFileNames = false,
   aspectRatio = "1/1",
   columns = 3,
+  showRejectToasts = true,
 }: ImageUploaderProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = React.useState(false);
-  const [lightbox, setLightbox] = React.useState<string | null>(null);
+  const [lightboxId, setLightboxId] = React.useState<string | null>(null);
   const [images, setImages] = React.useState<ImageFile[]>(() =>
     toImageFiles(defaultFiles ?? [])
   );
   const dragCounter = React.useRef(0);
 
-  /* revoke preview URLs on unmount */
+  /* Keep a live ref to the current images so the unmount cleanup can revoke
+   * every preview URL — not just the ones present at mount. The event
+   * handlers below update this alongside every setImages call, and it is
+   * also re-synced after each commit via the effect. */
+  const imagesRef = React.useRef(images);
   React.useEffect(() => {
-    const snapshot = images;
-    return () => snapshot.forEach((img) => URL.revokeObjectURL(img.preview));
+    imagesRef.current = images;
+  }, [images]);
+
+  /* Revoke ALL preview URLs on unmount (reads the latest list via ref). */
+  React.useEffect(() => {
+    return () => {
+      imagesRef.current.forEach((img) => URL.revokeObjectURL(img.preview));
+    };
+  }, []);
+
+  /* Notify the parent once about any pre-populated defaultFiles so a
+   * controlled parent starts in sync. Runs a single time on mount. */
+  React.useEffect(() => {
+    if (imagesRef.current.length > 0) {
+      onChange?.(imagesRef.current.map((i) => i.file));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /* ── surface rejected files via callback + (optional) toast ── */
+  const reportRejections = React.useCallback(
+    (rejected: RejectedFile[]) => {
+      if (rejected.length === 0) return;
+      onReject?.(rejected);
+      if (!showRejectToasts) return;
+
+      const counts = rejected.reduce<Record<RejectReason, number>>(
+        (acc, r) => {
+          acc[r.reason] = (acc[r.reason] ?? 0) + 1;
+          return acc;
+        },
+        {} as Record<RejectReason, number>
+      );
+
+      const messages: Record<RejectReason, (n: number) => string> = {
+        type: (n) => `${n} file${n > 1 ? "s" : ""} skipped — unsupported type`,
+        size: (n) =>
+          `${n} file${n > 1 ? "s" : ""} skipped — larger than ${formatBytes(maxSize)}`,
+        duplicate: (n) => `${n} duplicate file${n > 1 ? "s" : ""} skipped`,
+        max: (n) =>
+          `${n} file${n > 1 ? "s" : ""} skipped — limit of ${maxImages} reached`,
+      };
+
+      (Object.keys(counts) as RejectReason[]).forEach((reason) => {
+        toast.error(messages[reason](counts[reason]));
+      });
+    },
+    [maxSize, maxImages, onReject, showRejectToasts]
+  );
 
   /* ── process incoming files ── */
   const processFiles = React.useCallback(
     (incoming: FileList | File[]) => {
-      setImages((prev) => {
-        const slots = maxImages - prev.length;
-        if (slots <= 0) return prev;
+      const prev = imagesRef.current;
+      const slots = maxImages - prev.length;
 
-        const accepted: ImageFile[] = [];
+      const rejected: RejectedFile[] = [];
 
-        Array.from(incoming)
-          .slice(0, slots)
-          .forEach((file) => {
-            if (!file.type.startsWith("image/")) return; // silently reject non-images
-            if (file.size > maxSize) return;             // silently reject oversized files
+      if (slots <= 0) {
+        Array.from(incoming).forEach((file) =>
+          rejected.push({ file, reason: "max" })
+        );
+        reportRejections(rejected);
+        return;
+      }
 
-            accepted.push({
-              id: uid(),
-              file,
-              preview: URL.createObjectURL(file),
-              status: "idle",
-            });
-          });
+      const existingKeys = new Set(prev.map((i) => fileKey(i.file)));
+      const seenKeys = new Set<string>();
+      const valid: File[] = [];
 
-        if (accepted.length === 0) return prev;
-
-        const next = [...prev, ...accepted];
-        onChange?.(next.map((i) => i.file));
-        return next;
+      // Validate FIRST, then take only as many as we have slots for.
+      Array.from(incoming).forEach((file) => {
+        if (!matchesAccept(file, accept) || !file.type.startsWith("image/")) {
+          rejected.push({ file, reason: "type" });
+          return;
+        }
+        if (file.size > maxSize) {
+          rejected.push({ file, reason: "size" });
+          return;
+        }
+        const key = fileKey(file);
+        if (existingKeys.has(key) || seenKeys.has(key)) {
+          rejected.push({ file, reason: "duplicate" });
+          return;
+        }
+        seenKeys.add(key);
+        valid.push(file);
       });
+
+      // Anything valid beyond the available slots is a "max" rejection.
+      if (valid.length > slots) {
+        valid.slice(slots).forEach((file) =>
+          rejected.push({ file, reason: "max" })
+        );
+      }
+
+      const toAdd = valid.slice(0, slots).map((file) => ({
+        id: uid(),
+        file,
+        preview: URL.createObjectURL(file),
+        status: "idle" as const,
+      }));
+
+      reportRejections(rejected);
+
+      if (toAdd.length === 0) return;
+
+      const next = [...prev, ...toAdd];
+      imagesRef.current = next;
+      setImages(next);
+      onChange?.(next.map((i) => i.file));
     },
-    [maxImages, maxSize, onChange]
+    [maxImages, maxSize, accept, onChange, reportRejections]
   );
 
   /* ── remove ── */
   const remove = React.useCallback(
     (id: string) => {
-      setImages((prev) => {
-        const target = prev.find((i) => i.id === id);
-        if (target) URL.revokeObjectURL(target.preview);
-        const next = prev.filter((i) => i.id !== id);
-        onChange?.(next.map((i) => i.file));
-        return next;
-      });
+      const prev = imagesRef.current;
+      const target = prev.find((i) => i.id === id);
+      if (!target) return;
+      URL.revokeObjectURL(target.preview);
+      const next = prev.filter((i) => i.id !== id);
+      imagesRef.current = next;
+      setImages(next);
+      onChange?.(next.map((i) => i.file));
+      // Close the lightbox if the image being previewed was removed.
+      setLightboxId((current) => (current === id ? null : current));
     },
     [onChange]
   );
@@ -175,8 +303,17 @@ export function ImageUploader({
     if (!disabled) processFiles(e.dataTransfer.files);
   };
 
+  const openPicker = () => inputRef.current?.click();
+  const handleZoneKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+      openPicker();
+    }
+  };
+
   const isFull = images.length >= maxImages;
   const canAdd = !disabled && !isFull;
+  const lightboxImg = images.find((i) => i.id === lightboxId) ?? null;
 
   /* ────────────────────────── Render ────────────────────────── */
   return (
@@ -192,8 +329,8 @@ export function ImageUploader({
             onDragLeave={handleDragLeave}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
-            onClick={() => inputRef.current?.click()}
-            onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
+            onClick={openPicker}
+            onKeyDown={handleZoneKeyDown}
             className={cn(
               "group relative flex cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border-2 border-dashed px-6 py-10 text-center transition-all duration-300 select-none",
               isDragging
@@ -263,6 +400,7 @@ export function ImageUploader({
               accept={accept}
               multiple={maxImages > 1}
               className="sr-only"
+              tabIndex={-1}
               onChange={(e) => {
                 if (e.target.files) processFiles(e.target.files);
                 e.target.value = "";
@@ -281,17 +419,18 @@ export function ImageUploader({
                 aspectRatio={aspectRatio}
                 showFileName={showFileNames}
                 onRemove={() => remove(img.id)}
-                onZoom={() => setLightbox(img.preview)}
+                onZoom={() => setLightboxId(img.id)}
                 disabled={disabled}
               />
             ))}
 
             {/* "add more" card — shown inside grid when not full */}
-            {!isFull && images.length > 0 && (
+            {canAdd && (
               <button
                 type="button"
-                onClick={() => inputRef.current?.click()}
+                onClick={openPicker}
                 disabled={disabled}
+                aria-label="Add more images"
                 style={{ aspectRatio }}
                 className={cn(
                   "group flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/20 text-muted-foreground transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 hover:text-primary",
@@ -306,11 +445,25 @@ export function ImageUploader({
             )}
           </div>
         )}
+
+        {/* ── Status row — keeps the counter visible even when the drop zone
+            is hidden (e.g. when the max has been reached). ── */}
+        {images.length > 0 && !canAdd && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <ImageIcon className="size-3" />
+            {images.length} / {maxImages}
+            {isFull && <span>· limit reached</span>}
+          </div>
+        )}
       </div>
 
       {/* ── Lightbox ── */}
-      {lightbox && (
-        <Lightbox src={lightbox} onClose={() => setLightbox(null)} />
+      {lightboxImg && (
+        <Lightbox
+          src={lightboxImg.preview}
+          alt={lightboxImg.file.name}
+          onClose={() => setLightboxId(null)}
+        />
       )}
     </>
   );
@@ -416,19 +569,42 @@ function ActionButton({
 
 /* ───────────────────────────── Lightbox ───────────────────────────── */
 
-function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
+function Lightbox({
+  src,
+  alt,
+  onClose,
+}: {
+  src: string;
+  alt: string;
+  onClose: () => void;
+}) {
+  const closeRef = React.useRef<HTMLButtonElement>(null);
+
   React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+
+    return () => {
+      window.removeEventListener("keydown", handler);
+      previouslyFocused?.focus?.();
+    };
   }, [onClose]);
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image preview"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={onClose}
     >
       <Button
+        ref={closeRef}
         variant="ghost"
         size="icon"
         className="absolute top-4 right-4 text-white hover:bg-white/10"
@@ -441,7 +617,7 @@ function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
-        alt="Preview"
+        alt={alt}
         className="max-h-[90vh] max-w-[90vw] rounded-xl object-contain shadow-2xl animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       />

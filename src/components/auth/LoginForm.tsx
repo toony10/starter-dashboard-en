@@ -88,7 +88,7 @@ export function LoginForm() {
         </InputGroup>
       </div>
 
-      <Button type="submit" size="lg" className="group h-10 w-full">
+      <Button type="submit" size="lg" className="cursor-pointer group h-10 w-full">
         Sign in
         <ArrowRight
           className={ cn(

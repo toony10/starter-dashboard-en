@@ -1,6 +1,6 @@
 import { LoginForm } from "@/components/auth/LoginForm";
 import { ThemeSwitcher } from "@/components/layout/ThemeSwitcher";
-
+import AnimationWrapper from "@/components/shared/animations/AnimationWrapper";
 export const metadata = {
   title: "Sign in | Starter Dash",
   description: "Sign in to your Starter Dash account",
@@ -13,9 +13,9 @@ export default function LoginPage() {
         <ThemeSwitcher />
       </div>
 
-      <div className="w-full max-w-sm rounded-xl border bg-card p-8 shadow-lg ring-1 ring-foreground/5">
+      <AnimationWrapper className="w-full max-w-sm rounded-xl border p-8 shadow-lg ring-1 ring-foreground/5 backdrop-blur-md bg-card/20">
         <LoginForm />
-      </div>
+      </AnimationWrapper>
     </div>
   );
 }

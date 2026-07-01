@@ -113,16 +113,17 @@ function ToolbarButton({
       <TooltipTrigger asChild>
         <Button
           type="button"
-          variant={isActive ? "secondary" : "ghost"}
+          variant={ isActive ? "secondary" : "ghost" }
           size="icon-sm"
-          onClick={onClick}
-          disabled={disabled}
-          aria-pressed={isActive ?? false}
+          onClick={ onClick }
+          disabled={ disabled }
+          className={ cn(isActive && "bg-primary/20 focus:bg-primary/40") }
+          aria-pressed={ isActive ?? false }
         >
-          {children}
+          { children }
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{tooltip}</TooltipContent>
+      <TooltipContent>{ tooltip }</TooltipContent>
     </Tooltip>
   )
 }
@@ -138,7 +139,7 @@ export function RichTextEditor({
   disabled = false,
   minHeight = 200,
 }: RichTextEditorProps) {
-  const minH = typeof minHeight === "number" ? `${minHeight}px` : minHeight
+  const minH = typeof minHeight === "number" ? `${ minHeight }px` : minHeight
 
   const editor = useEditor({
     extensions: [
@@ -207,10 +208,10 @@ export function RichTextEditor({
 
   return (
     <TooltipProvider>
-      {/* Scoped editor styles */}
-      <style>{`
+      {/* Scoped editor styles */ }
+      <style>{ `
         .rte-editor .tiptap {
-          min-height: ${minH};
+          min-height: ${ minH };
           padding: 12px 14px;
           outline: none;
           font-size: 0.875rem;
@@ -277,37 +278,37 @@ export function RichTextEditor({
       `}</style>
 
       <div
-        className={cn(
+        className={ cn(
           "overflow-hidden rounded-lg border border-input bg-background transition-all",
           "focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50",
           disabled && "cursor-not-allowed opacity-60",
           className,
-        )}
+        ) }
       >
-        {/* ── Toolbar ─────────────────────────────────────────────────────── */}
+        {/* ── Toolbar ─────────────────────────────────────────────────────── */ }
         <div
           className="flex flex-wrap items-center gap-px border-b border-border bg-muted/40 p-1.5"
-          onMouseDown={(e) => e.preventDefault()}
+          onMouseDown={ (e) => e.preventDefault() }
         >
-          {/* Undo / Redo */}
+          {/* Undo / Redo */ }
           <ToolbarButton
             tooltip="Undo (⌘Z)"
-            disabled={disabled || !state?.canUndo}
-            onClick={() => editor.chain().focus().undo().run()}
+            disabled={ disabled || !state?.canUndo }
+            onClick={ () => editor.chain().focus().undo().run() }
           >
             <Undo2 />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Redo (⌘⇧Z)"
-            disabled={disabled || !state?.canRedo}
-            onClick={() => editor.chain().focus().redo().run()}
+            disabled={ disabled || !state?.canRedo }
+            onClick={ () => editor.chain().focus().redo().run() }
           >
             <Redo2 />
           </ToolbarButton>
 
           <Separator orientation="vertical" className="mx-1 h-5" />
 
-          {/* Block type */}
+          {/* Block type */ }
           <DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -316,12 +317,12 @@ export function RichTextEditor({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    disabled={disabled}
+                    disabled={ disabled }
                     className="h-7 w-28 justify-between gap-1 px-2 text-xs font-normal"
                   >
                     <Type className="size-3.5 shrink-0" />
                     <span className="flex-1 truncate text-left">
-                      {currentBlockLabel}
+                      { currentBlockLabel }
                     </span>
                     <ChevronDown className="size-3 shrink-0 opacity-50" />
                   </Button>
@@ -331,14 +332,14 @@ export function RichTextEditor({
             </Tooltip>
             <DropdownMenuContent align="start">
               <DropdownMenuItem
-                onSelect={() => editor.chain().focus().setParagraph().run()}
+                onSelect={ () => editor.chain().focus().setParagraph().run() }
                 className="gap-2 text-sm"
               >
                 <Type className="size-4" />
                 Paragraph
               </DropdownMenuItem>
               <DropdownMenuItem
-                onSelect={() =>
+                onSelect={ () =>
                   editor.chain().focus().toggleHeading({ level: 1 }).run()
                 }
                 className="gap-2"
@@ -349,7 +350,7 @@ export function RichTextEditor({
                 Heading 1
               </DropdownMenuItem>
               <DropdownMenuItem
-                onSelect={() =>
+                onSelect={ () =>
                   editor.chain().focus().toggleHeading({ level: 2 }).run()
                 }
                 className="gap-2"
@@ -360,7 +361,7 @@ export function RichTextEditor({
                 Heading 2
               </DropdownMenuItem>
               <DropdownMenuItem
-                onSelect={() =>
+                onSelect={ () =>
                   editor.chain().focus().toggleHeading({ level: 3 }).run()
                 }
                 className="gap-2"
@@ -375,43 +376,43 @@ export function RichTextEditor({
 
           <Separator orientation="vertical" className="mx-1 h-5" />
 
-          {/* Inline formatting */}
+          {/* Inline formatting */ }
           <ToolbarButton
             tooltip="Bold (⌘B)"
-            isActive={state?.isBold}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().toggleBold().run()}
+            isActive={ state?.isBold }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().toggleBold().run() }
           >
             <Bold />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Italic (⌘I)"
-            isActive={state?.isItalic}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().toggleItalic().run()}
+            isActive={ state?.isItalic }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().toggleItalic().run() }
           >
             <Italic />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Underline (⌘U)"
-            isActive={state?.isUnderline}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
+            isActive={ state?.isUnderline }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().toggleUnderline().run() }
           >
             <LucideUnderline />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Strikethrough"
-            isActive={state?.isStrike}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().toggleStrike().run()}
+            isActive={ state?.isStrike }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().toggleStrike().run() }
           >
             <Strikethrough />
           </ToolbarButton>
 
           <Separator orientation="vertical" className="mx-1 h-5" />
 
-          {/* Text color */}
+          {/* Text color */ }
           <DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -420,7 +421,7 @@ export function RichTextEditor({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    disabled={disabled}
+                    disabled={ disabled }
                   >
                     <Palette />
                   </Button>
@@ -433,45 +434,45 @@ export function RichTextEditor({
                 Text color
               </p>
               <div className="grid grid-cols-5 gap-1.5">
-                {TEXT_COLORS.map(({ label, value }) => (
+                { TEXT_COLORS.map(({ label, value }) => (
                   <button
-                    key={value}
+                    key={ value }
                     type="button"
-                    title={label}
-                    className={cn(
+                    title={ label }
+                    className={ cn(
                       "flex size-6 items-center justify-center rounded border transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring",
                       value === "unset"
                         ? "border-border bg-background text-[10px] font-semibold text-foreground/70 hover:border-foreground/30"
                         : "border-transparent hover:border-foreground/20",
-                    )}
+                    ) }
                     style={
                       value !== "unset" ? { backgroundColor: value } : undefined
                     }
-                    onClick={() => {
+                    onClick={ () => {
                       if (value === "unset") {
                         editor.chain().focus().unsetColor().run()
                       } else {
                         editor.chain().focus().setColor(value).run()
                       }
-                    }}
+                    } }
                   >
-                    {value === "unset" ? "A" : null}
+                    { value === "unset" ? "A" : null }
                   </button>
-                ))}
+                )) }
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Highlight */}
+          {/* Highlight */ }
           <DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
                   <Button
                     type="button"
-                    variant={state?.isHighlight ? "secondary" : "ghost"}
+                    variant={ state?.isHighlight ? "secondary" : "ghost" }
                     size="icon-sm"
-                    disabled={disabled}
+                    disabled={ disabled }
                   >
                     <Highlighter />
                   </Button>
@@ -484,144 +485,144 @@ export function RichTextEditor({
                 Highlight color
               </p>
               <div className="flex gap-1.5">
-                {HIGHLIGHT_COLORS.map(({ label, value }) => (
+                { HIGHLIGHT_COLORS.map(({ label, value }) => (
                   <button
-                    key={label}
+                    key={ label }
                     type="button"
-                    title={label}
-                    className={cn(
+                    title={ label }
+                    className={ cn(
                       "flex size-6 items-center justify-center rounded border transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring",
                       !value
                         ? "border-border bg-background text-[10px] font-semibold text-foreground/50 hover:border-foreground/30"
                         : "border-transparent hover:border-foreground/20",
-                    )}
-                    style={value ? { backgroundColor: value } : undefined}
-                    onClick={() => {
+                    ) }
+                    style={ value ? { backgroundColor: value } : undefined }
+                    onClick={ () => {
                       if (!value) {
                         editor.chain().focus().unsetHighlight().run()
                       } else {
                         editor.chain().focus().setHighlight({ color: value }).run()
                       }
-                    }}
+                    } }
                   >
-                    {!value ? "✕" : null}
+                    { !value ? "✕" : null }
                   </button>
-                ))}
+                )) }
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
 
           <Separator orientation="vertical" className="mx-1 h-5" />
 
-          {/* Text alignment */}
+          {/* Text alignment */ }
           <ToolbarButton
             tooltip="Align left"
-            isActive={state?.isAlignLeft}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().setTextAlign("left").run()}
+            isActive={ state?.isAlignLeft }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().setTextAlign("left").run() }
           >
             <AlignLeft />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Align center"
-            isActive={state?.isAlignCenter}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().setTextAlign("center").run()}
+            isActive={ state?.isAlignCenter }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().setTextAlign("center").run() }
           >
             <AlignCenter />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Align right"
-            isActive={state?.isAlignRight}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().setTextAlign("right").run()}
+            isActive={ state?.isAlignRight }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().setTextAlign("right").run() }
           >
             <AlignRight />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Justify"
-            isActive={state?.isAlignJustify}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+            isActive={ state?.isAlignJustify }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().setTextAlign("justify").run() }
           >
             <AlignJustify />
           </ToolbarButton>
 
           <Separator orientation="vertical" className="mx-1 h-5" />
 
-          {/* Lists */}
+          {/* Lists */ }
           <ToolbarButton
             tooltip="Bullet list"
-            isActive={state?.isBulletList}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            isActive={ state?.isBulletList }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().toggleBulletList().run() }
           >
             <List />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Numbered list"
-            isActive={state?.isOrderedList}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            isActive={ state?.isOrderedList }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().toggleOrderedList().run() }
           >
             <ListOrdered />
           </ToolbarButton>
 
           <Separator orientation="vertical" className="mx-1 h-5" />
 
-          {/* Block elements */}
+          {/* Block elements */ }
           <ToolbarButton
             tooltip="Blockquote"
-            isActive={state?.isBlockquote}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+            isActive={ state?.isBlockquote }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().toggleBlockquote().run() }
           >
             <Quote />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Inline code"
-            isActive={state?.isCode}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().toggleCode().run()}
+            isActive={ state?.isCode }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().toggleCode().run() }
           >
             <Code />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Code block"
-            isActive={state?.isCodeBlock}
-            disabled={disabled}
-            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+            isActive={ state?.isCodeBlock }
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().toggleCodeBlock().run() }
           >
             <FileCode />
           </ToolbarButton>
           <ToolbarButton
             tooltip="Divider"
-            disabled={disabled}
-            onClick={() => editor.chain().focus().setHorizontalRule().run()}
+            disabled={ disabled }
+            onClick={ () => editor.chain().focus().setHorizontalRule().run() }
           >
             <Minus />
           </ToolbarButton>
 
           <Separator orientation="vertical" className="mx-1 h-5" />
 
-          {/* Link */}
+          {/* Link */ }
           <ToolbarButton
-            tooltip={state?.isLink ? "Remove link" : "Add link"}
-            isActive={state?.isLink}
-            disabled={disabled}
-            onClick={handleLink}
+            tooltip={ state?.isLink ? "Remove link" : "Add link" }
+            isActive={ state?.isLink }
+            disabled={ disabled }
+            onClick={ handleLink }
           >
             <Link2 />
           </ToolbarButton>
         </div>
 
-        {/* ── Editable area ────────────────────────────────────────────────── */}
-        <EditorContent editor={editor} className="rte-editor" />
+        {/* ── Editable area ────────────────────────────────────────────────── */ }
+        <EditorContent editor={ editor } className="rte-editor" />
 
-        {/* Hidden input for native form submission */}
-        {name && (
-          <input type="hidden" name={name} value={editor.getHTML()} />
-        )}
+        {/* Hidden input for native form submission */ }
+        { name && (
+          <input type="hidden" name={ name } value={ editor.getHTML() } />
+        ) }
       </div>
     </TooltipProvider>
   )
