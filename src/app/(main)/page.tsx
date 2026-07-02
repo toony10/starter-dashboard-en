@@ -60,8 +60,8 @@ const moduleMeta: Record<
 > = {
   Forms: {
     description:
-      "Rich text editing, image uploads, and file uploads with validation and previews.",
-    highlights: ["Rich Text Editor", "Image Uploader", "File Uploader"],
+      "Rich text editing, image uploads, file uploads, and date-time inputs with validation and previews.",
+    highlights: ["Rich Text Editor", "Image Uploader", "File Uploader", "Date Input"],
   },
   Filters: {
     description:

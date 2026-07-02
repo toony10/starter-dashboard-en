@@ -41,6 +41,7 @@ export const navigation: NavGroup[] = [
           { title: "Rich Text Editor", url: "/forms/rich-text" },
           { title: "Image Uploader", url: "/forms/image-uploader" },
           { title: "File Uploader", url: "/forms/file-uploader" },
+          { title: "Date Input", url: "/forms/date-input" },
         ],
       },
       {
@@ -50,6 +51,9 @@ export const navigation: NavGroup[] = [
         items: [
           { title: "Pagination", url: "/filters/pagination" },
           { title: "Select Filter", url: "/filters/select" },
+          { title: "Multi Select Filter", url: "/filters/multiple-select" },
+          { title: "Tabs Filter", url: "/filters/tabs" },
+          { title: "Date Filter", url: "/filters/date" },
           { title: "Search Filter", url: "/filters/search" },
           { title: "Limit Filter", url: "/filters/limit" },
           { title: "Reset Filters", url: "/filters/reset" },

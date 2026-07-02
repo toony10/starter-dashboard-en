@@ -16,10 +16,28 @@ const filterPages = [
         href: "/filters/select",
     },
     {
+        title: "Multiple Select Filter",
+        description:
+            "Dropdown filter that syncs multiple selected values to URL search params as comma-separated lists.",
+        href: "/filters/multiple-select",
+    },
+    {
+        title: "Tabs Filter",
+        description:
+            "Tabbed filter with animated indicator that syncs to URL search params.",
+        href: "/filters/tabs",
+    },
+    {
         title: "Search Filter",
         description:
             "Text search that syncs the query to URL search params.",
         href: "/filters/search",
+    },
+    {
+        title: "Date Filter",
+        description:
+            "Date picker that syncs selected dates to URL search params in ISO format.",
+        href: "/filters/date",
     },
     {
         title: "Limit Filter",

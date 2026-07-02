@@ -21,6 +21,12 @@ const formPages = [
       "Upload documents, spreadsheets, and archives with validation and file type icons.",
     href: "/forms/file-uploader",
   },
+  {
+    title: "Date Input",
+    description:
+      "Calendar date picker with optional time controls for form fields and native submit support.",
+    href: "/forms/date-input",
+  },
 ];
 
 export default function FormsPage() {
@@ -28,7 +34,7 @@ export default function FormsPage() {
     <div className="flex flex-col gap-8">
       <MainH
         title="Forms"
-        description="Reusable form components for rich text, images, and file uploads."
+        description="Reusable form components for rich text, images, file uploads, and date-time inputs."
       />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         { formPages.map((page) => (

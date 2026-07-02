@@ -1,0 +1,87 @@
+"use client"
+
+import { useMemo } from "react"
+import { ChevronDownIcon } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
+import { debounce, parseAsArrayOf, parseAsString, useQueryState } from "nuqs"
+import type { SelectFilterOption } from "./SelectFilter"
+
+const DEBOUNCE_MS = 600
+
+export interface MultipleSelectFilterProps {
+  paramKey: string
+  options: SelectFilterOption[]
+  placeholder?: string
+  className?: string
+}
+
+export function MultipleSelectFilter({
+  paramKey,
+  options,
+  placeholder = "Choose options",
+  className,
+}: MultipleSelectFilterProps) {
+  const [values, setValues] = useQueryState(
+    paramKey,
+    parseAsArrayOf(parseAsString).withDefault([]).withOptions({
+      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      clearOnDefault: true,
+    }),
+  )
+
+  const valueSet = useMemo(() => new Set(values), [values])
+
+  const labelByValue = useMemo(
+    () => Object.fromEntries(options.map((option) => [option.value, option.label])),
+    [options],
+  )
+
+  const displayLabel = useMemo(() => {
+    if (values.length === 0) return null
+    if (values.length === 1) return labelByValue[values[0]] ?? values[0]
+    return `${values.length} selected`
+  }, [values, labelByValue])
+
+  const toggleValue = (optionValue: string) => {
+    const next = valueSet.has(optionValue)
+      ? values.filter((value) => value !== optionValue)
+      : [...values, optionValue]
+
+    setValues(next.length === 0 ? null : next, {
+      limitUrlUpdates: debounce(DEBOUNCE_MS),
+    })
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className={ cn(
+          "flex h-8 w-full min-w-40 items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-placeholder:text-muted-foreground dark:bg-input/30 dark:hover:bg-input/50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+          !displayLabel && "text-muted-foreground",
+          className,
+        ) }
+      >
+        <span className="line-clamp-1">{ displayLabel ?? placeholder }</span>
+        <ChevronDownIcon className="size-4 opacity-50" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="min-w-(--radix-dropdown-menu-trigger-width)">
+        { options.map((option) => (
+          <DropdownMenuCheckboxItem
+            key={ option.value }
+            checked={ valueSet.has(option.value) }
+            onCheckedChange={ () => toggleValue(option.value) }
+            onSelect={ (event) => event.preventDefault() }
+          >
+            { option.label }
+          </DropdownMenuCheckboxItem>
+        )) }
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
