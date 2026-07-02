@@ -85,14 +85,6 @@
 
 .dark {
   --background: #2C2C2C;
-  
-  /* Another Dark bg Colors (Uncomment to use) */
-  /* --background: #0F0E0E; */
-  /* --background: #2C3947; */
-  /* --background: #30364F; */
-  /* --background: #222222; */
-  /* --background: #132440; */
-  /* --background: #213448; */
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -119,7 +111,7 @@
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent: oklch(1 0 0 / 12%);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);

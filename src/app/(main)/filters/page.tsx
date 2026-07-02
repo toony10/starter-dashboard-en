@@ -15,6 +15,24 @@ const filterPages = [
             "Dropdown filter that syncs a selected value to URL search params.",
         href: "/filters/select",
     },
+    {
+        title: "Search Filter",
+        description:
+            "Text search that syncs the query to URL search params.",
+        href: "/filters/search",
+    },
+    {
+        title: "Limit Filter",
+        description:
+            "Select filter that syncs the page size limit to URL search params.",
+        href: "/filters/limit",
+    },
+    {
+        title: "Reset Filters",
+        description:
+            "Button that clears selected search params from the URL.",
+        href: "/filters/reset",
+    },
 ];
 
 export default function FiltersPage() {

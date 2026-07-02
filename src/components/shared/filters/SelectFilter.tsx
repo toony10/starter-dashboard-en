@@ -45,6 +45,7 @@ export function SelectFilter({
 
   return (
     <Select
+      key={ `${paramKey}:${value || "__empty__"}` }
       value={ selectValue }
       onValueChange={ (next) => {
         setValue(next === ALL_VALUE ? null : next, {

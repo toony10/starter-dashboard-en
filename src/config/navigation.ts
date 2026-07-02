@@ -5,6 +5,7 @@ import {
   type LucideIcon,
   PencilRuler,
   Filter,
+  Table,
 } from "lucide-react";
 
 export type NavSubItem = {
@@ -29,7 +30,7 @@ export const navigation: NavGroup[] = [
     items: [
       {
         title: "Dashboard",
-        url: "/dashboard",
+        url: "/",
         icon: LayoutDashboard,
       },
       {
@@ -49,17 +50,31 @@ export const navigation: NavGroup[] = [
         items: [
           { title: "Pagination", url: "/filters/pagination" },
           { title: "Select Filter", url: "/filters/select" },
+          { title: "Search Filter", url: "/filters/search" },
+          { title: "Limit Filter", url: "/filters/limit" },
+          { title: "Reset Filters", url: "/filters/reset" },
         ],
       },
       {
-        title: "Analytics",
-        url: "/dashboard/analytics",
+        title: "Charts",
+        url: "/charts",
         icon: BarChart,
+        items: [
+          { title: "Dashboard Charts", url: "/charts/analytics" },
+        ],
+      },
+      {
+        title: "Table",
+        url: "/table",
+        icon: Table,
       },
       {
         title: "Settings",
-        url: "/dashboard/settings",
+        url: "/settings",
         icon: Settings,
+        items: [
+          { title: "Dark Theme Colors", url: "/settings/dark-theme" },
+        ],
       },
     ],
   },

@@ -51,7 +51,7 @@ export function GlobalSearch() {
         });
         item.items?.forEach((child) => {
           items.push({
-            title: `${item.title} > ${child.title}`,
+            title: `${ item.title } > ${ child.title }`,
             href: child.url,
             icon: item.icon,
           });
@@ -66,10 +66,10 @@ export function GlobalSearch() {
     <>
       <Button
         variant="outline"
-        className={cn(
+        className={ cn(
           "relative h-9 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-muted-foreground shadow-none sm:pr-12 md:w-2/3 lg:w-1/3"
-        )}
-        onClick={() => setOpen(true)}
+        ) }
+        onClick={ () => setOpen(true) }
       >
         <Search className="mr-2 h-4 w-4 shrink-0" />
         <span className="hidden lg:inline-flex">Search pages...</span>
@@ -78,26 +78,26 @@ export function GlobalSearch() {
           <span className="text-xs">⌘</span>K
         </kbd>
       </Button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog open={ open } onOpenChange={ setOpen }>
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="Pages">
-            {searchableItems.map((item) => {
+            { searchableItems.map((item) => {
               const Icon = item.icon;
               return (
                 <CommandItem
-                  key={item.href + item.title}
-                  value={item.title}
-                  onSelect={() => {
+                  key={ item.href + item.title }
+                  value={ item.title }
+                  onSelect={ () => {
                     runCommand(() => router.push(item.href));
-                  }}
+                  } }
                 >
                   <Icon className="mr-2 h-4 w-4 shrink-0" />
-                  {item.title}
+                  { item.title }
                 </CommandItem>
               );
-            })}
+            }) }
           </CommandGroup>
         </CommandList>
       </CommandDialog>
