@@ -11,9 +11,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { cn } from "@/lib/utils"
-
-const DEBOUNCE_MS = 600
 
 function toISOParam(date: Date): string {
   return date.toISOString()
@@ -39,7 +38,7 @@ export function DateFilter({
   const [value, setValue] = useQueryState(
     paramKey,
     parseAsString.withDefault("").withOptions({
-      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
       clearOnDefault: true,
     }),
   )
@@ -67,7 +66,7 @@ export function DateFilter({
           selected={ selectedDate }
           onSelect={ (date) => {
             setValue(date ? toISOParam(date) : null, {
-              limitUrlUpdates: debounce(DEBOUNCE_MS),
+              limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
             })
             setOpen(false)
           } }

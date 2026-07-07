@@ -8,9 +8,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { debounce, parseAsInteger, useQueryState } from "nuqs"
-
-const DEBOUNCE_MS = 600
 
 const DEFAULT_LIMIT_OPTIONS = [10, 20, 30, 40, 50]
 
@@ -32,7 +31,7 @@ export function LimitFilter({
   const [limit, setLimit] = useQueryState(
     paramKey,
     parseAsInteger.withDefault(defaultLimit).withOptions({
-      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
       clearOnDefault: true,
     }),
   )
@@ -42,7 +41,7 @@ export function LimitFilter({
       value={ String(limit) }
       onValueChange={ (next) => {
         setLimit(Number(next), {
-          limitUrlUpdates: debounce(DEBOUNCE_MS),
+          limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
         })
       } }
     >

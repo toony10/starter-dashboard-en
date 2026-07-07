@@ -9,10 +9,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { debounce, parseAsArrayOf, parseAsString, useQueryState } from "nuqs"
 import type { SelectFilterOption } from "./SelectFilter"
-
-const DEBOUNCE_MS = 600
 
 export interface MultipleSelectFilterProps {
   paramKey: string
@@ -30,7 +29,7 @@ export function MultipleSelectFilter({
   const [values, setValues] = useQueryState(
     paramKey,
     parseAsArrayOf(parseAsString).withDefault([]).withOptions({
-      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
       clearOnDefault: true,
     }),
   )
@@ -54,7 +53,7 @@ export function MultipleSelectFilter({
       : [...values, optionValue]
 
     setValues(next.length === 0 ? null : next, {
-      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
     })
   }
 

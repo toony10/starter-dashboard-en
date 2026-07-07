@@ -10,9 +10,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { cn } from "@/lib/utils"
+import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { debounce, parseAsInteger, useQueryState } from "nuqs"
-
-const DEBOUNCE_MS = 600
 
 type PageItem = number | "ellipsis"
 
@@ -61,7 +60,7 @@ export function Pagination({
   const [page, setPage] = useQueryState(
     paramKey,
     parseAsInteger.withDefault(1).withOptions({
-      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
     }),
   )
 
@@ -75,7 +74,7 @@ export function Pagination({
     }
 
     setPage(nextPage, {
-      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
     })
   }
 

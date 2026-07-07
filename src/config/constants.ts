@@ -1,0 +1,1 @@
+export const FILTER_URL_UPDATE_DELAY_MS = 600

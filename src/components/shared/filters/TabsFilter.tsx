@@ -1,10 +1,9 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { debounce, parseAsString, useQueryState } from "nuqs"
 import { cn } from "@/lib/utils"
-
-const DEBOUNCE_MS = 600
 const ALL_VALUE = "__all__"
 
 export type TabsFilterOption = {
@@ -28,7 +27,7 @@ export function TabsFilter({
   const [value, setValue] = useQueryState(
     paramKey,
     parseAsString.withDefault("").withOptions({
-      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
       clearOnDefault: true,
     }),
   )
@@ -41,7 +40,7 @@ export function TabsFilter({
 
   const handleSelect = (next: string) => {
     setValue(next === ALL_VALUE ? null : next, {
-      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
     })
   }
 

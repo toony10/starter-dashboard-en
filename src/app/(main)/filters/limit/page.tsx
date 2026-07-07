@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation"
 import { LimitFilter } from "@/components/shared/filters/LimitFilter"
 import { MainH, SectionH } from "@/components/shared/text/Headings"
+import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 
 function SearchParamsPreview() {
   const searchParams = useSearchParams()
@@ -61,7 +62,7 @@ export default function LimitFilterPage() {
       <section className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-4">
         <SectionH
           title="Current search params"
-          description="URL updates are debounced by 600ms after each selection."
+          description={`URL updates are debounced by ${FILTER_URL_UPDATE_DELAY_MS}ms after each selection.`}
         />
         <SearchParamsPreview />
       </section>

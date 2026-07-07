@@ -8,9 +8,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { debounce, parseAsString, useQueryState } from "nuqs"
-
-const DEBOUNCE_MS = 600
 const ALL_VALUE = "__all__"
 
 export type SelectFilterOption = {
@@ -36,7 +35,7 @@ export function SelectFilter({
   const [value, setValue] = useQueryState(
     paramKey,
     parseAsString.withDefault("").withOptions({
-      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
       clearOnDefault: true,
     }),
   )
@@ -49,7 +48,7 @@ export function SelectFilter({
       value={ selectValue }
       onValueChange={ (next) => {
         setValue(next === ALL_VALUE ? null : next, {
-          limitUrlUpdates: debounce(DEBOUNCE_MS),
+          limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
         })
       } }
     >

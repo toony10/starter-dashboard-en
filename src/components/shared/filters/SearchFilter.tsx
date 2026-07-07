@@ -7,9 +7,8 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group"
 import { cn } from "@/lib/utils"
+import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { debounce, parseAsString, useQueryState } from "nuqs"
-
-const DEBOUNCE_MS = 600
 
 export interface SearchFilterProps {
   paramKey?: string
@@ -25,7 +24,7 @@ export function SearchFilter({
   const [value, setValue] = useQueryState(
     paramKey,
     parseAsString.withDefault("").withOptions({
-      limitUrlUpdates: debounce(DEBOUNCE_MS),
+      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
       clearOnDefault: true,
     }),
   )
@@ -42,7 +41,7 @@ export function SearchFilter({
         onChange={ (event) => {
           const next = event.target.value
           setValue(next === "" ? null : next, {
-            limitUrlUpdates: debounce(DEBOUNCE_MS),
+            limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
           })
         } }
       />
