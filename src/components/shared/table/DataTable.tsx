@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useQueryNavigation } from "@/components/providers/query-navigation-provider"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const SKELETON_ROW_COUNT = 10
@@ -30,6 +31,7 @@ export function DataTable<TData, TValue>({
   data,
   isLoading = false,
 }: DataTableProps<TData, TValue>) {
+  const { isPending } = useQueryNavigation()
   const table = useReactTable({
     data,
     columns,
@@ -40,6 +42,7 @@ export function DataTable<TData, TValue>({
   })
 
   const columnCount = columns.length
+  const showLoading = isLoading || isPending
 
   return (
     <div className="overflow-hidden rounded-sm border">
@@ -61,12 +64,12 @@ export function DataTable<TData, TValue>({
           )) }
         </TableHeader>
         <TableBody>
-          { isLoading ? (
+          { showLoading ? (
             Array.from({ length: SKELETON_ROW_COUNT }).map((_, rowIndex) => (
               <TableRow key={ `skeleton-${ rowIndex }` }>
                 { Array.from({ length: columnCount }).map((_, colIndex) => (
                   <TableCell key={ `skeleton-${ rowIndex }-${ colIndex }` }>
-                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full bg-primary/10" />
                   </TableCell>
                 )) }
               </TableRow>

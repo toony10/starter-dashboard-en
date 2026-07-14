@@ -1,5 +1,6 @@
 "use client"
 
+import { useQueryNavigation } from "@/components/providers/query-navigation-provider"
 import {
   Select,
   SelectContent,
@@ -8,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
+import { DEFAULT_LIMIT, FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { debounce, parseAsInteger, useQueryState } from "nuqs"
 
 const DEFAULT_LIMIT_OPTIONS = [10, 20, 30, 40, 50]
@@ -24,10 +25,11 @@ export interface LimitFilterProps {
 export function LimitFilter({
   paramKey = "limit",
   options = DEFAULT_LIMIT_OPTIONS,
-  defaultLimit = DEFAULT_LIMIT_OPTIONS[0],
+  defaultLimit = DEFAULT_LIMIT,
   placeholder = "Rows per page",
   className,
 }: LimitFilterProps) {
+  const { startTransition } = useQueryNavigation()
   const [limit, setLimit] = useQueryState(
     paramKey,
     parseAsInteger.withDefault(defaultLimit).withOptions({
@@ -42,6 +44,7 @@ export function LimitFilter({
       onValueChange={ (next) => {
         setLimit(Number(next), {
           limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
+          startTransition,
         })
       } }
     >

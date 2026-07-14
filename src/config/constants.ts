@@ -1,1 +1,4 @@
-export const FILTER_URL_UPDATE_DELAY_MS = 600
+export const SEARCH_FILTER_URL_UPDATE_DELAY_MS = 500
+export const FILTER_URL_UPDATE_DELAY_MS = 100
+export const DEFAULT_PAGE = 1
+export const DEFAULT_LIMIT = 10

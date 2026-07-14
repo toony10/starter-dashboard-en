@@ -9,6 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import { useQueryNavigation } from "@/components/providers/query-navigation-provider"
 import { cn } from "@/lib/utils"
 import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { debounce, parseAsInteger, useQueryState } from "nuqs"
@@ -57,6 +58,7 @@ export function Pagination({
   paramKey = "page",
   className,
 }: PaginationProps) {
+  const { isPending, startTransition } = useQueryNavigation()
   const [page, setPage] = useQueryState(
     paramKey,
     parseAsInteger.withDefault(1).withOptions({
@@ -75,6 +77,7 @@ export function Pagination({
 
     setPage(nextPage, {
       limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
+      startTransition,
     })
   }
 
@@ -83,7 +86,10 @@ export function Pagination({
   }
 
   return (
-    <PaginationRoot className={ cn(className) }>
+    <PaginationRoot
+      className={ cn(isPending && "pointer-events-none opacity-50", className) }
+      aria-busy={ isPending }
+    >
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious

@@ -3,6 +3,7 @@
 import { useMemo } from "react"
 import { useSearchParams } from "next/navigation"
 import { RotateCcw } from "lucide-react"
+import { useQueryNavigation } from "@/components/providers/query-navigation-provider"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { parseAsString, useQueryStates } from "nuqs"
@@ -18,6 +19,7 @@ export function ResetFilters({
   label = "Reset filters",
   className,
 }: ResetFiltersProps) {
+  const { startTransition } = useQueryNavigation()
   const searchParams = useSearchParams()
   const keysKey = keys.join("\0")
   const keyMap = useMemo(
@@ -29,7 +31,9 @@ export function ResetFilters({
   const hasActiveFilters = keys.some((key) => searchParams.has(key))
 
   const reset = () => {
-    setStates(Object.fromEntries(keys.map((key) => [key, null])))
+    setStates(Object.fromEntries(keys.map((key) => [key, null])), {
+      startTransition,
+    })
   }
 
   return (

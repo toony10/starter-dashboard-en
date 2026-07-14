@@ -4,6 +4,7 @@ import { format, isValid, parseISO } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import * as React from "react"
 import { debounce, parseAsString, useQueryState } from "nuqs"
+import { useQueryNavigation } from "@/components/providers/query-navigation-provider"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -34,6 +35,7 @@ export function DateFilter({
   placeholder = "Pick a date",
   className,
 }: DateFilterProps) {
+  const { startTransition } = useQueryNavigation()
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = useQueryState(
     paramKey,
@@ -67,6 +69,7 @@ export function DateFilter({
           onSelect={ (date) => {
             setValue(date ? toISOParam(date) : null, {
               limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
+              startTransition,
             })
             setOpen(false)
           } }

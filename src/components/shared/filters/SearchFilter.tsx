@@ -6,8 +6,9 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
+import { useQueryNavigation } from "@/components/providers/query-navigation-provider"
 import { cn } from "@/lib/utils"
-import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
+import { SEARCH_FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { debounce, parseAsString, useQueryState } from "nuqs"
 
 export interface SearchFilterProps {
@@ -21,10 +22,11 @@ export function SearchFilter({
   placeholder = "Search...",
   className,
 }: SearchFilterProps) {
+  const { startTransition } = useQueryNavigation()
   const [value, setValue] = useQueryState(
     paramKey,
     parseAsString.withDefault("").withOptions({
-      limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
+      limitUrlUpdates: debounce(SEARCH_FILTER_URL_UPDATE_DELAY_MS),
       clearOnDefault: true,
     }),
   )
@@ -41,7 +43,8 @@ export function SearchFilter({
         onChange={ (event) => {
           const next = event.target.value
           setValue(next === "" ? null : next, {
-            limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
+            limitUrlUpdates: debounce(SEARCH_FILTER_URL_UPDATE_DELAY_MS),
+            startTransition,
           })
         } }
       />

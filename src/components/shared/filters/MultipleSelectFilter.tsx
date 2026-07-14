@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useQueryNavigation } from "@/components/providers/query-navigation-provider"
 import { cn } from "@/lib/utils"
 import { FILTER_URL_UPDATE_DELAY_MS } from "@/config/constants"
 import { debounce, parseAsArrayOf, parseAsString, useQueryState } from "nuqs"
@@ -26,6 +27,7 @@ export function MultipleSelectFilter({
   placeholder = "Choose options",
   className,
 }: MultipleSelectFilterProps) {
+  const { startTransition } = useQueryNavigation()
   const [values, setValues] = useQueryState(
     paramKey,
     parseAsArrayOf(parseAsString).withDefault([]).withOptions({
@@ -54,6 +56,7 @@ export function MultipleSelectFilter({
 
     setValues(next.length === 0 ? null : next, {
       limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
+      startTransition,
     })
   }
 

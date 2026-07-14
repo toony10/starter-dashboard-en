@@ -39,7 +39,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={ { __html: getAppearanceInitScript() } }
         />
-        <NuqsAdapter>
+        <NuqsAdapter defaultOptions={{ shallow: false }}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

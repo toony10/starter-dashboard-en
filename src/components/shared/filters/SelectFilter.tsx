@@ -1,5 +1,6 @@
 "use client"
 
+import { useQueryNavigation } from "@/components/providers/query-navigation-provider"
 import {
   Select,
   SelectContent,
@@ -32,6 +33,7 @@ export function SelectFilter({
   placeholder = "Choose an option",
   className,
 }: SelectFilterProps) {
+  const { startTransition } = useQueryNavigation()
   const [value, setValue] = useQueryState(
     paramKey,
     parseAsString.withDefault("").withOptions({
@@ -49,6 +51,7 @@ export function SelectFilter({
       onValueChange={ (next) => {
         setValue(next === ALL_VALUE ? null : next, {
           limitUrlUpdates: debounce(FILTER_URL_UPDATE_DELAY_MS),
+          startTransition,
         })
       } }
     >
